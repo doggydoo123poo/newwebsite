@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="new.css">
+    <title>Submit Name</title>
+    <script>
+      function displayText() {
+        var input = document.getElementById("input").value;
+        if (/\d/.test(input)) { // Check if input contains any numbers
+          showAlert("Please do not insert numbers, letters only please.");
+          return;
+        }
+        var customText = "Your submitted name is: " + input;
+        showAlert(customText);
+        document.getElementById("input").value = ""; // Clear the input field
+      }
+
+      function showAlert(message) {
+        var alertBox = document.getElementById("alertBox");
+        if (alertBox) {
+          alertBox.textContent = message; // Update the existing alert box
+        } else {
+          alertBox = document.createElement("div");
+          alertBox.id = "alertBox";
+          alertBox.style.backgroundColor = "#f9f9f9";
+          alertBox.style.border = "1px solid #ccc";
+          alertBox.style.padding = "10px";
+          alertBox.style.margin = "10px";
+          alertBox.textContent = message;
+          document.body.appendChild(alertBox);
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <input type="text" id="input" placeholder="Name" />
+    <button id = 'button' type="button" onclick="displayText()">Submit</button>
+  </body>
+</html>
