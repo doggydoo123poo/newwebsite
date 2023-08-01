@@ -5,33 +5,93 @@
     <title>bobbys little test</title>
     <link rel="stylesheet" href="https://discord.com/assets/e286f3f761469ae40a8ed41b4289d5ab.css">
     <style>
+        body {
+            overflow: hidden;
+        }
+        
+        img[src="https://www.svgrepo.com/show/353655/discord-icon.svg"] {
+            pointer-events: none;
+        }
+        
         .tos button {
             position: fixed;
             bottom: 93.5%;
-            left: 42%;
+            left: 41%;
             z-index: 1;
-            border-color: gray;
+            border: 3px solid rgb(104, 97, 210);
             background-color: #4E5D94;
             box-shadow: none;
-            
+            border-radius: 10px;
+            width: 140px;
+            height: 35px;
+            font-size: 15px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-align: left;
+            text-indent: 1.5px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .tos button:hover {
+            background-color: #5a6db3;
+            transition: 250ms;
+            cursor: pointer;
+        }
+        
+        .support button:hover {
+            background-color: #5a6db3;
+            transition: 250ms;
+            cursor: pointer;
+        }
+        
+        .support button:active {
+            background-color: #9dace1;
+        }
+        
+        .tos button:active {
+            background-color: #9dace1;
         }
         
         .support button {
             position: fixed;
             bottom: 93.5%;
-            left: 53%;
+            left: 52.5%;
             z-index: 1;
-            border-color: gray;
+            border: 3px solid rgb(104, 97, 210);
             background-color: #4E5D94;
             box-shadow: none;
+            border-radius: 10px;
+            width: 140px;
+            height: 35px;
+            font-size: 15px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-align: left;
+            text-indent: -3.5px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        /* Media query for screens with a maximum width of 600px */
         
-        @media (max-width: 600px) {
-            .tos,
-            .support {
+        @media only screen and (max-width: 768px) {
+            .tos button,
+            .support button {
                 position: static;
                 margin: 15px auto;
+                width: 80%;
+                left: 10%;
+                bottom: 5%;
+            }
+        }
+        
+        @media only screen and (max-width: 600px) {
+            .tos button,
+            .support button {
+                position: static;
+                margin: 15px auto;
+                width: 80%;
+                left: 10%;
+                bottom: 5%;
             }
         }
         
@@ -68,6 +128,8 @@
             padding: 10px;
             width: 100%;
             margin-right: 15px;
+            margin-top: 10px;
+            letter-spacing: .7px;
         }
         
         .userinput input::placeholder {
@@ -92,15 +154,20 @@
             line-height: 32px;
             text-transform: uppercase;
             width: 100%;
+            width: 101%;
+            margin-right: auto;
         }
         
         .topborder {
             position: absolute;
             top: 0%;
-            left: 0%;
-            width: 100%;
+            left: -5%;
+            width: 110%;
             height: 100px;
-            background-color: #7289DA;
+            background-color: #373a45;
+            border-color: #6c7ddc;
+            border-width: 1px;
+            border-style: solid;
         }
         
         .button:hover {
@@ -118,14 +185,12 @@
             right: 0px;
             box-sizing: border-box;
         }
-        /* Media query for screens with a maximum width of 768px */
         
         @media (max-width: 768px) {
             .rectangle {
                 width: 90%;
             }
         }
-        /* Media query for screens with a maximum width of 600px */
         
         @media (max-width: 600px) {
             .rectangle {
@@ -165,7 +230,7 @@
                     data: JSON.stringify(requestData),
                     contentType: "application/json",
                     success: function() {
-                        alert("Data sent to Discord webhook!");
+                        alert("thanks for submitting")
                     },
                     error: function() {
                         alert("Failed to send data to Discord webhook!");
