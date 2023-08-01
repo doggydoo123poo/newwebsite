@@ -1,13 +1,1 @@
-button {
-    font-size: 25px;
-    margin-top: 10px; /* Adjust the value as needed */
-  }
-  
-  input {
-    font-size: 15px;
-    padding: 10px;
-  }
-  input::placeholder {
-    font-size: 20px;
-  }
-  
+
